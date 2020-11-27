@@ -1,6 +1,7 @@
 from prettytable import PrettyTable
 import sqlite3
-
+import time
+import re
 
 class PhoneBook():
 
@@ -50,9 +51,9 @@ class PhoneBook():
             self.conn.commit()
 
     def delete_contact(self, name, surname):
-    	self.cursor.execute("DELETE FROM phonebook WHERE name = ? AND surname = ?", [name, surname])
-    	self.conn.commit()
-    	return
+        self.cursor.execute("DELETE FROM phonebook WHERE name = ? AND surname = ?", [name, surname])
+        self.conn.commit()
+        return
 
 
     def add_number(self, name, surname, category, number):
@@ -91,12 +92,24 @@ class PhoneBook():
 
     @staticmethod
     def check_number(number):
-        return True
+        if re.fullmatch(r'(\+7|8)\d{10}', number):
+            return True
+        else:
+            return False
 
     @staticmethod
     def check_date(date):
+        try:
+            d = time.strptime(date, '%d.%m.%Y')
+        except ValueError:
+            return False
+        if d[0] > time.localtime(time.time())[0]:
+            return False
         return True
 
     @staticmethod
     def check_name(name):
-        return True
+        if re.fullmatch(r'[A-Z][A-Za-z\d ]*', name):
+            return True
+        else:
+            return False

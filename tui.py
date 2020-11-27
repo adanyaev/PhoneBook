@@ -6,6 +6,7 @@ from time import sleep
 book = PhoneBook()
 
 skip = False
+skip_input = False
 
 while True:
     if not skip:
@@ -25,13 +26,23 @@ while True:
 (3) Edit contact
 (4) Find contacts
 (5) Delete contact''')
-
-        command = input().strip()
+    if not skip_input:
+        command = input()
+    skip_input = False
     skip = False
     if command == '1':
         while True:
-            name = input('Enter name: ')
-            surname = input('Enter surname: ')
+            while True:
+                name = input('Enter name: ')
+                if PhoneBook.check_name(name):
+                    break
+                print("Incorrect input. Try again")
+            while True:
+                surname = input('Enter surname: ')
+                if PhoneBook.check_name(surname):
+                    break
+                print("Incorrect input. Try again")
+
             ret = True
             if book.get_contacts(name, surname):
                 print("This contact already exists. You can edit him (1), enter new name (2) or go back to menu (3)")
@@ -40,6 +51,7 @@ while True:
                     if com == "1":
                         command = "3"
                         skip = True
+                        skip_input = True
                         ret = 'back'
                         break
                     elif com == "2":
@@ -78,7 +90,7 @@ while True:
                     print("Incorrect input")
 
             while True:
-                number = input("Enter number: ")
+                number = input("Enter number starting from +7 or 8:")
                 if PhoneBook.check_number(number):
                     break
                 print("incorrect input. Try again")
@@ -89,7 +101,7 @@ while True:
             book.add_number(name, surname, category, number)
 
             while True:
-                com = input("Add additional number? (1) for YES, (2) for NO:")
+                com = input("Add additional number? (1) for YES, (2) for NO: ")
                 if com == '1':
                     ret = True
                     break
@@ -130,8 +142,7 @@ while True:
     elif command == '3':
         os.system('cls' if os.name == 'nt' else 'clear')
         while True:
-            print(
-                "Enter name and surname of the contact, print \"all\" to see all contacts or \"back\" to go back to menu")
+            print("Enter name and surname of the contact, print \"all\" to see all contacts or \"back\" to go back to menu")
             s = input()
             if s == "all":
                 os.system('cls' if os.name == 'nt' else 'clear')
@@ -139,7 +150,7 @@ while True:
                 continue
             if s == "back":
                 break
-            if len(s.split(' ')) == 1 or s.split(' ')[1] == '':
+            if len(s.split(' ')) != 2 or s.split(' ')[1] == '':
                 print("Wrong input. try again")
                 continue
 
@@ -201,12 +212,14 @@ while True:
 
                     if not nums:
                         print("{} {} does not have {} numbers yet".format(name, surname, cats[cat]))
-                        print("Enter new number:")
+                        print("Enter new number starting from +7 or 8:")
                         while True:
                             number = input()
                             if PhoneBook.check_number(number):
                                 break
                             print("Incorrect input. Try again")
+                        if number[0] == '+':
+                            number = '8' + number[2:]
                         book.add_number(name, surname, cats[cat], number)
                         os.system('cls' if os.name == 'nt' else 'clear')
                         print("New number successfully added")
@@ -218,7 +231,7 @@ while True:
                         s += "({}) {}\n".format(i + 1, nums[i])
                     s += "({}) Add new number".format(len(nums) + 1)
                     print(s)
-                    print("Enter the number of phone that you want to replace")
+                    print("Enter the number of phone that you want to replace or delete")
                     while True:
                         opt = input()
                         opts = [str(i) for i in range(1, len(nums) + 2)]
@@ -229,35 +242,42 @@ while True:
                     opt = int(opt) - 1
 
                     if opt == len(nums):
-                        print("Enter new number:")
+                        print("Enter new number starting from +7 or 8:")
                         while True:
                             number = input()
                             if PhoneBook.check_number(number):
                                 break
                             print("Incorrect input. Try again")
+                        if number[0] == '+':
+                            number = '8' + number[2:]
                         book.add_number(name, surname, cats[cat], number)
                         os.system('cls' if os.name == 'nt' else 'clear')
                         print("New number successfully added")
                         continue
 
-                    print("{} will be replaced. Enter new number:".format(nums[opt]))
+                    print("{} is chosen. Enter new number (starting from +7 or 8) or type \"delete\" to delete it:".format(nums[opt]))
                     while True:
                         num = input()
-                        if not PhoneBook.check_number(num):
+                        if not PhoneBook.check_number(num) and num != 'delete':
                             print("Wrong input. Try again")
                             continue
                         break
-                    nums[opt] = num
+                    if num == 'delete':
+                        nums.pop(opt)
+                    else:
+                        if num[0] == '+':
+                            num = '8' + num[2:]
+                        nums[opt] = num
                     book.add_numbers(name, surname, cats[cat], nums)
                     os.system('cls' if os.name == 'nt' else 'clear')
-                    print("Number successfully changed")
+                    print("Number successfully changed" if num != 'delete' else "Number successfully deleted")
                     continue
 
                 elif com == '6':
                     while True:
-                        newdate = input("Enter new date")
+                        newdate = input("Enter new date in this format \"dd.mm.yyyy\": ")
                         if not PhoneBook.check_date(newdate):
-                            print("Incorrect surname. Try again")
+                            print("Incorrect date. Try again")
                             continue
                         break
                     book.add_date(name, surname, newdate)
@@ -309,7 +329,7 @@ while True:
             os.system('cls' if os.name == 'nt' else 'clear')
             continue
         while True:
-            print("Enter the number or the list of numbers comma separated or type \"skip\":")
+            print("Enter the number or the list of numbers (starting from 8 or +7) comma separated or type \"skip\":")
             nums = input()
             if nums != 'skip':
                 nums = [i.strip() for i in nums.split(',')]
@@ -335,15 +355,19 @@ while True:
             os.system('cls' if os.name == 'nt' else 'clear')
             continue
         while True:
-            print("Enter date in this format \"dd.mm\" or print \"skip\":")
+            print("Enter date in this \"dd.mm.yyyy\" or this \"dd.mm\" formats or print \"skip\":")
             date = input()
             if date != 'skip':
-                if not PhoneBook.check_date(date):
-                    print("incorrect input. Try again")
+                if not PhoneBook.check_date(date if len(date) > 5 else date + '.2000'):
+                    print("Incorrect date. Try again")
                     continue
                 for i in contacts:
-                    if i[5][:5] != date:
-                        contacts.remove(i)
+                    if len(date) == 5:
+                        if i[5][:5] != date:
+                            contacts.remove(i)
+                    else:
+                        if i[5] != date:
+                            contacts.remove(i)
                 break
             else:
                 break
@@ -363,6 +387,50 @@ while True:
             continue   
 
     elif command == '5':
-        exit()
+        os.system('cls' if os.name == 'nt' else 'clear')
+        while True:
+            print("Enter name and surname of the contact that you want to delete, type \"all\" so see all contacts or \"back\" to go back to menu: ")
+            com = input()
+            if com == "all":
+                os.system('cls' if os.name == 'nt' else 'clear')
+                print(book)
+                continue
+            elif com == "back":
+                break
+            else:
+                contact = com.split(' ')
+                if len(contact) != 2:
+                    os.system('cls' if os.name == 'nt' else 'clear')
+                    print("Wrong input. Try again")
+                    continue
+                if not book.get_contacts(contact[0], contact[1]):
+                    os.system('cls' if os.name == 'nt' else 'clear')
+                    print("Contact was not found. Try again")
+                    continue
+                os.system('cls' if os.name == 'nt' else 'clear')
+                book.print_contacts(book.get_contacts(contact[0], contact[1]))
+                print("This contact will be deleted. Are you sure? (1) for YES, (2) for NO: ")
+                while True:
+                    com = input()
+                    ret = False
+                    if com == '2':
+                        ret = True
+                        break
+                    elif com == '1':
+                        ret = False
+                        break
+                    else:
+                        print("Wrong input. Try again")
+                        continue
+                if ret:
+                    os.system('cls' if os.name == 'nt' else 'clear')
+                    continue
+                book.delete_contact(contact[0], contact[1])
+                os.system('cls' if os.name == 'nt' else 'clear')
+                print('{} {} was successfully deleted'.format(contact[0], contact[1]))
+                continue
+
+        
     else:
         print("Wrong input. Try again")
+        skip = True

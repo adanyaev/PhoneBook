@@ -25,7 +25,8 @@ while True:
 (2) Print phonebook
 (3) Edit contact
 (4) Find contacts
-(5) Delete contact''')
+(5) Delete contact
+(6) Find out age of contact''')
     if not skip_input:
         command = input()
     skip_input = False
@@ -430,7 +431,36 @@ while True:
                 print('{} {} was successfully deleted'.format(contact[0], contact[1]))
                 continue
 
-        
+    elif command == '6':
+        while True:
+            print("Enter name and surname of the contact, type \"all\" so see all contacts or \"back\" to go back to menu: ")
+            com = input()
+            if com == "all":
+                os.system('cls' if os.name == 'nt' else 'clear')
+                print(book)
+                continue
+            elif com == "back":
+                break
+            else:
+                contact = com.split(' ')
+                if len(contact) != 2:
+                    os.system('cls' if os.name == 'nt' else 'clear')
+                    print("Wrong input. Try again")
+                    continue
+                if not book.get_contacts(contact[0], contact[1]):
+                    os.system('cls' if os.name == 'nt' else 'clear')
+                    print("Contact was not found. Try again")
+                    continue
+                os.system('cls' if os.name == 'nt' else 'clear')
+                book.print_contacts(book.get_contacts(contact[0], contact[1]))
+                age = book.get_age(contact[0], contact[1])
+                print("{} {} is {} years old. Press Enter to continue".format(contact[0], contact[1], age))
+                input()
+                os.system('cls' if os.name == 'nt' else 'clear')
+                continue
+
+
+
     else:
         print("Wrong input. Try again")
         skip = True

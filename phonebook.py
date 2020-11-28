@@ -1,6 +1,7 @@
 from prettytable import PrettyTable
 import sqlite3
 import time
+import datetime
 import re
 
 class PhoneBook():
@@ -72,6 +73,15 @@ class PhoneBook():
     def add_date(self, name, surname, date):
         self.cursor.execute("UPDATE phonebook SET birthdate='{}' WHERE name=? AND surname=?".format(date), [name, surname])
         self.conn.commit()
+
+
+    def get_age(self, name, surname):
+        date = self.get_contacts(name, surname)[0][5].split('.')
+        d1 = time.strptime("{}.{}.{}.0.0.0".format(*date), "%d.%m.%Y.%H.%M.%S")
+        t1 = time.mktime(d1)
+        age = (time.time() - t1)/(60*60*24*365.25)
+        return (int(age))
+
 
     def __str__(self):
         self.cursor.execute("SELECT * FROM phonebook")

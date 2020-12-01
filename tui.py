@@ -25,8 +25,10 @@ while True:
 (2) Print phonebook
 (3) Edit contact
 (4) Find contacts
-(5) Delete contact
-(6) Find out age of contact''')
+(5) Delete contact by name and surname
+(6) Delete contact by number
+(7) Find out age of contact
+(8) See contacts with birtday in the next 30 days''')
     if not skip_input:
         command = input()
     skip_input = False
@@ -143,7 +145,8 @@ while True:
     elif command == '3':
         os.system('cls' if os.name == 'nt' else 'clear')
         while True:
-            print("Enter name and surname of the contact, print \"all\" to see all contacts or \"back\" to go back to menu")
+            print(
+                "Enter name and surname of the contact, print \"all\" to see all contacts or \"back\" to go back to menu")
             s = input()
             if s == "all":
                 os.system('cls' if os.name == 'nt' else 'clear')
@@ -256,7 +259,9 @@ while True:
                         print("New number successfully added")
                         continue
 
-                    print("{} is chosen. Enter new number (starting from +7 or 8) or type \"delete\" to delete it:".format(nums[opt]))
+                    print(
+                        "{} is chosen. Enter new number (starting from +7 or 8) or type \"delete\" to delete it:".format(
+                            nums[opt]))
                     while True:
                         num = input()
                         if not PhoneBook.check_number(num) and num != 'delete':
@@ -303,7 +308,7 @@ while True:
 
     elif command == '4':
         os.system('cls' if os.name == 'nt' else 'clear')
-        
+
         while True:
             name = input("Enter name or type \"skip\" if name doesn`t matter: ")
             if name == "skip":
@@ -341,7 +346,8 @@ while True:
                     else:
                         if i[0] == '+':
                             i = '8' + i[2:]
-                for i in contacts:
+                contacts1 = contacts
+                for i in contacts1:
                     for j in nums:
                         if not (i[2].find(j) != -1 or i[3].find(j) != -1 or i[4].find(j) != -1):
                             contacts.remove(i)
@@ -362,7 +368,8 @@ while True:
                 if not PhoneBook.check_date(date if len(date) > 5 else date + '.2000'):
                     print("Incorrect date. Try again")
                     continue
-                for i in contacts:
+                contacts1 = contacts
+                for i in contacts1:
                     if len(date) == 5:
                         if i[5][:5] != date:
                             contacts.remove(i)
@@ -385,12 +392,13 @@ while True:
             print("Press any key to continue")
             sys.stdin.read(1)
             os.system('cls' if os.name == 'nt' else 'clear')
-            continue   
+            continue
 
     elif command == '5':
         os.system('cls' if os.name == 'nt' else 'clear')
         while True:
-            print("Enter name and surname of the contact that you want to delete, type \"all\" so see all contacts or \"back\" to go back to menu: ")
+            print(
+                "Enter name and surname of the contact that you want to delete, type \"all\" so see all contacts or \"back\" to go back to menu: ")
             com = input()
             if com == "all":
                 os.system('cls' if os.name == 'nt' else 'clear')
@@ -432,8 +440,94 @@ while True:
                 continue
 
     elif command == '6':
+        os.system('cls' if os.name == 'nt' else 'clear')
         while True:
-            print("Enter name and surname of the contact, type \"all\" so see all contacts or \"back\" to go back to menu: ")
+            print(
+                "Enter number or list of numbers comma separated of the contacts you want to delete,\ntype \"all\" so see all contacts or \"back\" to go back to menu: ")
+            com = input()
+            if com == "all":
+                os.system('cls' if os.name == 'nt' else 'clear')
+                print(book)
+                continue
+            elif com == "back":
+                break
+            else:
+                nums = [i.strip() for i in com.split(',')]
+                f = False
+                for i in nums:
+                    if not PhoneBook.check_number(i):
+                        os.system('cls' if os.name == 'nt' else 'clear')
+                        print("Wrong input. Try again")
+                        f = True
+                        break
+                if f:
+                    continue
+                for i in nums:
+                    if i[0] == '+':
+                        i = '8' + i[2:]
+                contacts = book.get_contacts()
+                cont1 = []
+                for i in contacts:
+                    for j in nums:
+                        if i[2].find(j) != -1 or i[3].find(j) != -1 or i[4].find(j) != -1:
+                            cont1.append(i)
+                            break
+                contacts = cont1
+                if not contacts:
+                    os.system('cls' if os.name == 'nt' else 'clear')
+                    print("No contacts found. Try again")
+                    continue
+                os.system('cls' if os.name == 'nt' else 'clear')
+                book.print_contacts(contacts)
+                if len(contacts) == 1:
+                    print("Delete this contact? \"Y\" for yes or \"N\" to go back")
+                    while True:
+                        com = input()
+                        if com == 'Y':
+                            book.delete_contact(contacts[0][0], contacts[0][1])
+                            os.system('cls' if os.name == 'nt' else 'clear')
+                            print("Contact successfully deleted")
+                            break
+                        elif com == 'N':
+                            os.system('cls' if os.name == 'nt' else 'clear')
+                            print("Deletion cancelled")
+                            break
+                        else:
+                            print("wrong input. Try again")
+                else:
+                    print(
+                        "These contacts were found. Enter number or numbers of contacts you want to delete comma separated (1-{})\nor print \"skip\"".format(
+                            len(contacts)))
+                    while True:
+                        com = input()
+                        if com == 'skip':
+                            os.system('cls' if os.name == 'nt' else 'clear')
+                            print("Deletion cancelled")
+                            break
+                        nums = [i.strip() for i in com.split(',')]
+                        f = True
+                        for i in nums:
+                            for j in range(1, len(contacts)+1):
+                                if i == str(j):
+                                    break
+                            else:
+                                f = False
+                                break
+                        if not f:
+                            print("Wrong input. Try again")
+                            continue
+                        nums = [int(i)-1 for i in set(nums)]
+                        for i in nums:
+                            book.delete_contact(contacts[i][0], contacts[i][1])
+                        os.system('cls' if os.name == 'nt' else 'clear')
+                        print("Contacts successfully deleted")
+                        break
+
+
+    elif command == '7':
+        while True:
+            print(
+                "Enter name and surname of the contact, type \"all\" so see all contacts or \"back\" to go back to menu: ")
             com = input()
             if com == "all":
                 os.system('cls' if os.name == 'nt' else 'clear')
@@ -451,6 +545,10 @@ while True:
                     os.system('cls' if os.name == 'nt' else 'clear')
                     print("Contact was not found. Try again")
                     continue
+                if book.get_contacts(contact[0], contact[1])[0][5] == '':
+                    os.system('cls' if os.name == 'nt' else 'clear')
+                    print("This contact has no date of birth. Try again")
+                    continue
                 os.system('cls' if os.name == 'nt' else 'clear')
                 book.print_contacts(book.get_contacts(contact[0], contact[1]))
                 age = book.get_age(contact[0], contact[1])
@@ -458,6 +556,19 @@ while True:
                 input()
                 os.system('cls' if os.name == 'nt' else 'clear')
                 continue
+
+    elif command == '8':
+        contacts = book.get_nearest_birthdays()
+        if not contacts:
+            print("There are no contacts with birthday in the next 30 days.\n Press Enter to continue")
+            input()
+            continue
+        for i in contacts:
+            print("{} {}`s birthday will be on {}".format(i[0], i[1], i[5][:5]))
+        print("Press Enter to continue")
+        input()
+        continue
+
 
 
 

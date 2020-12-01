@@ -82,6 +82,18 @@ class PhoneBook():
         age = (time.time() - t1)/(60*60*24*365.25)
         return (int(age))
 
+    def get_nearest_birthdays(self):
+    	contacts = [i for i in self.get_contacts() if i[5] != '']
+    	cons = []
+    	for i in contacts:
+    		date = i[5].split('.')
+    		dc = time.strptime("{}.{}.1980.0.0.0".format(date[0], date[1]), "%d.%m.%Y.%H.%M.%S")
+    		dn = time.localtime(time.time())
+    		if dn[7]-dc[7] < 30 or dn[7]-dc[7] > 335:
+    			cons.append(i)
+    	return cons
+
+
 
     def __str__(self):
         self.cursor.execute("SELECT * FROM phonebook")

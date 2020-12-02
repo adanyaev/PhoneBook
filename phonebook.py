@@ -93,20 +93,33 @@ class PhoneBook():
     			cons.append(i)
     	return cons
 
+    def get_sorted_contacts(self, mode, age):
+    	contacts = self.get_contacts()
+    	if mode == '>':
+    		f = lambda x,y: x>y
+    	elif mode == '<':
+    		f = lambda x,y: x<y
+    	else:
+    		f = lambda x,y: x==y
+    	res = contacts[:]
+    	for i in contacts:
+    		if i[5] == '' or not f(self.get_age(i[0], i[1]), age):
+    			res.remove(i)
+    	return res
 
 
     def __str__(self):
         self.cursor.execute("SELECT * FROM phonebook")
         data = self.cursor.fetchall()
         x = PrettyTable()
-        x.field_names = ['name', 'surname', 'mobile', 'working', 'home', 'date']
+        x.field_names = ['Name', 'Surname', 'Mobile numbers', 'Working numbers', 'Home numbers', 'Date of birth']
         x.add_rows(data)
         return str(x)
 
 
     def print_contacts(self, data):
         x = PrettyTable()
-        x.field_names = ['name', 'surname', 'mobile', 'working', 'home', 'date']
+        x.field_names = ['Name', 'Surname', 'Mobile numbers', 'Working numbers', 'Home numbers', 'Date of birth']
         x.add_rows(data)
         print(x)
         return

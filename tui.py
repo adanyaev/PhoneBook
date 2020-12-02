@@ -28,7 +28,8 @@ while True:
 (5) Delete contact by name and surname
 (6) Delete contact by number
 (7) Find out age of contact
-(8) See contacts with birtday in the next 30 days''')
+(8) See contacts with birtday in the next 30 days
+(9) Sort contacts by age''')
     if not skip_input:
         command = input()
     skip_input = False
@@ -346,7 +347,7 @@ while True:
                     else:
                         if i[0] == '+':
                             i = '8' + i[2:]
-                contacts1 = contacts
+                contacts1 = contacts[:]
                 for i in contacts1:
                     for j in nums:
                         if not (i[2].find(j) != -1 or i[3].find(j) != -1 or i[4].find(j) != -1):
@@ -368,7 +369,7 @@ while True:
                 if not PhoneBook.check_date(date if len(date) > 5 else date + '.2000'):
                     print("Incorrect date. Try again")
                     continue
-                contacts1 = contacts
+                contacts1 = contacts[:]
                 for i in contacts1:
                     if len(date) == 5:
                         if i[5][:5] != date:
@@ -507,7 +508,7 @@ while True:
                         nums = [i.strip() for i in com.split(',')]
                         f = True
                         for i in nums:
-                            for j in range(1, len(contacts)+1):
+                            for j in range(1, len(contacts) + 1):
                                 if i == str(j):
                                     break
                             else:
@@ -516,7 +517,7 @@ while True:
                         if not f:
                             print("Wrong input. Try again")
                             continue
-                        nums = [int(i)-1 for i in set(nums)]
+                        nums = [int(i) - 1 for i in set(nums)]
                         for i in nums:
                             book.delete_contact(contacts[i][0], contacts[i][1])
                         os.system('cls' if os.name == 'nt' else 'clear')
@@ -558,6 +559,7 @@ while True:
                 continue
 
     elif command == '8':
+        os.system('cls' if os.name == 'nt' else 'clear')
         contacts = book.get_nearest_birthdays()
         if not contacts:
             print("There are no contacts with birthday in the next 30 days.\n Press Enter to continue")
@@ -569,8 +571,41 @@ while True:
         input()
         continue
 
-
-
+    elif command == '9':
+        os.system('cls' if os.name == 'nt' else 'clear')
+        while True:
+            print(
+                "Enter \">n\" to see contacts over n years old, \"<n\" under n years old, \"=n\" exactly n years old:")
+            com = input()
+            if len(com) < 2:
+                os.system('cls' if os.name == 'nt' else 'clear')
+                print("Wrong input. Try again")
+                continue
+            mode = com[0]
+            age = com[1:]
+            if not (mode == '<' or mode == '>' or mode == '='):
+                os.system('cls' if os.name == 'nt' else 'clear')
+                print("Wrong input. Try again")
+                continue
+            f = False
+            for i in age:
+                if not ('0' <= i <= '9'):
+                    f = True
+                    break
+            if f:
+                os.system('cls' if os.name == 'nt' else 'clear')
+                print("Wrong input. Try again")
+                continue
+            contacts = book.get_sorted_contacts(mode, int(age))
+            if not contacts:
+                print("No contacts found. Press enter to continue")
+                input()
+                break
+            print("Age of these contacts {} {}".format(mode, int(age)))
+            book.print_contacts(contacts)
+            print("Press enter to continue")
+            input()
+            break
 
     else:
         print("Wrong input. Try again")

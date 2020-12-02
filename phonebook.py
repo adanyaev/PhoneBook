@@ -77,9 +77,10 @@ class PhoneBook():
 
     def get_age(self, name, surname):
         date = self.get_contacts(name, surname)[0][5].split('.')
-        d1 = time.strptime("{}.{}.{}.0.0.0".format(*date), "%d.%m.%Y.%H.%M.%S")
-        t1 = time.mktime(d1)
-        age = (time.time() - t1)/(60*60*24*365.25)
+        d1 = datetime.datetime(int(date[2]), int(date[1]), int(date[0]))
+        d2 = datetime.datetime.now()
+        dt = d2-d1
+        age = dt.days/365.25
         return (int(age))
 
     def get_nearest_birthdays(self):
@@ -87,9 +88,11 @@ class PhoneBook():
     	cons = []
     	for i in contacts:
     		date = i[5].split('.')
-    		dc = time.strptime("{}.{}.1980.0.0.0".format(date[0], date[1]), "%d.%m.%Y.%H.%M.%S")
-    		dn = time.localtime(time.time())
-    		if dn[7]-dc[7] < 30 or dn[7]-dc[7] > 335:
+    		dc = datetime.datetime(2000, int(date[1]), int(date[0]))
+    		dt = datetime.datetime.now()
+    		dn = datetime.datetime(2000, dt.month, dt.day)
+    		dt = dn-dc
+    		if abs(dt.days) < 30 or abs(dt.days) > 335:
     			cons.append(i)
     	return cons
 
@@ -148,3 +151,7 @@ class PhoneBook():
             return True
         else:
             return False
+
+
+if __name__ == "__main__":
+	print("You should run tui.py")

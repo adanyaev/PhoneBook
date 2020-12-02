@@ -29,7 +29,7 @@ while True:
 (5) Delete contact by name and surname
 (6) Delete contact by number
 (7) Find out age of contact
-(8) See contacts with birtday in the next 30 days
+(8) See contacts with birthday in the next 30 days
 (9) Sort contacts by age
 (10) Exit''')
         if not skip_input:
@@ -37,6 +37,7 @@ while True:
         skip_input = False
         skip = False
         if command == '1':
+            os.system('cls' if os.name == 'nt' else 'clear')
             while True:
                 while True:
                     name = input('Enter name: ')
@@ -572,7 +573,7 @@ while True:
                 input()
                 continue
             for i in contacts:
-                print("{} {}`s birthday will be on {}".format(i[0], i[1], i[5][:5]))
+                print("{} {}`s birthday will be on {}.{}".format(i[0], i[1], i[5].split('.')[0], i[5].split('.')[1]))
             print("Press Enter to continue")
             input()
             continue
